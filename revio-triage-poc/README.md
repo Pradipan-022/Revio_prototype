@@ -1,71 +1,106 @@
-# Revio AI Triage: Aspect Attribution & Risk-Aware Reply Routing
+# Revio AI Triage
 
-A self-contained Streamlit proof of concept for Cynbit Technologies' Revio
-reputation management platform. It uses a Hugging Face zero-shot NLI model to
-attribute review aspects and classify risk, then applies explicit three-lane
-routing policy for a fictional multi-location QSR and café chain.
+**Aspect attribution and risk-aware reply routing for customer reviews.**
 
-## Setup
+Revio AI Triage is a Streamlit proof of concept for a reputation-management
+workflow. It uses a Hugging Face zero-shot natural language inference (NLI)
+model to identify review topics and risk, then routes each review into one of
+three operational lanes. The sample data represents a fictional multi-location
+restaurant and cafe group.
 
-Requires Python 3.10 or later.
+> **Proof of concept:** This app is decision-support only. It does not connect to
+> review platforms or publish replies.
 
-```bash
-cd revio-triage-poc
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-python -m pip install -r requirements.txt
-streamlit run app.py
-```
+## Product demo
 
-The first analysis downloads `valhalla/distilbart-mnli-12-1` from Hugging Face
-and runs inference on CPU. Allow network access and enough disk space for the
-model cache. The model is loaded lazily; if dependencies or model download are
-unavailable, the UI reports the error rather than substituting a heuristic
-classifier.
+> **Demo coming soon:** Add a short recording at `docs/demo.gif` to showcase the
+> review inspector and branch dashboard.
 
-Run the policy verification script without downloading the model:
+<!-- Replace this placeholder with: ![Revio AI Triage demo](docs/demo.gif) -->
 
-```bash
-python test_engine.py
-```
+## What it does
 
-## Walkthrough
+- **Review inspector:** Analyze a review by branch and star rating; view the
+  predicted aspect, risk, confidence, rationale, and recommended route.
+- **Branch dashboard:** Triage the included sample reviews or upload a CSV to
+  compare review volume and routing across branches.
+- **Risk-aware routing:** Use confidence-gated routing and conservative phrase
+  overrides to hold potential safety, payment-fraud, and legal concerns for
+  management review.
+- **Reply drafting:** Generate a suggested response for eligible reviews;
+  higher-risk reviews are held rather than given a public reply.
 
-1. Open **Review inspector** and analyze the prefilled café review, or enter a
-   branch, rating, and review of your own.
-2. Observe the predicted aspect, risk category/confidence, rationale, and lane.
-3. Open **Branch dashboard** and run the included synthetic multi-location
-   review set, or upload a UTF-8 CSV.
-4. Inspect the branch-level lane counts, triage table, and manager escalation
-   details.
+## Routing lanes
 
-CSV columns: `review` is required; `branch`, `rating` (1–5), and `reviewer` are
-optional. Blank review rows are ignored.
-
-## Architecture
-
-- `engine.py` — typed Pydantic request/result schemas, lazy Hugging Face
-  zero-shot NLI adapter with descriptive aspect/risk hypotheses, deterministic
-  high-risk cue overrides, confidence-gated auto-publish, reply drafting, and
-  the routing policy. A small classifier protocol permits policy tests without
-  model downloads.
-- `app.py` — one Streamlit application with the review inspector and
-  multi-branch dashboard. It does not publish externally or require an API
-  server.
-- `test_engine.py` — deterministic routing cases, model-independent latency
-  measurement, and pass/fail accuracy output.
-
-## Routing and role alignment
-
-| Lane | Action | Revio role |
+| Lane | Route | Intended handling |
 | --- | --- | --- |
-| A · Auto-Publish | Routine praise / low-risk feedback; approved AI reply may publish immediately | Admin policy governs eligibility |
-| B · Advisor Draft Queue | Specific branch-level operations issue; verify draft before publishing | Advisor |
-| C · Manager Crisis Hold | Safety, hygiene, fraud, or legal/regulatory signal; public auto-reply blocked | Manager |
+| **A · Auto-Publish** | Routine, low-risk feedback | Eligible replies may be published under admin policy. |
+| **B · Advisor Draft Queue** | Branch-level service or operations issue | An advisor reviews the draft before publishing. |
+| **C · Manager Crisis Hold** | Safety, hygiene, fraud, or legal signal | Block public auto-reply and escalate to management. |
 
-Admin policy owns the lane thresholds; it does not mean every Lane A item needs
-an individual admin approval. Lane C has no reply draft. The included phrase
-guard conservatively raises certain explicit safety, payment-fraud, and legal
-signals to Lane C even when the model score is uncertain. Low-confidence
-non-crisis predictions stay in the Advisor queue rather than auto-publishing.
-This PoC is decision-support only and does not connect to review-provider APIs.
+Admin policy governs lane thresholds; it does not mean every Lane A item needs
+individual admin approval. Low-confidence, non-crisis predictions stay in the
+Advisor queue. Lane C has no reply draft. Phrase overrides conservatively raise
+some explicit crisis signals even when the model score is uncertain.
+
+## Requirements
+
+- Python **3.12** (the version is recorded in `.python-version`)
+- [`uv`](https://docs.astral.sh/uv/)
+- Network access on first analysis to download the
+  `valhalla/distilbart-mnli-12-1` model from Hugging Face
+
+The model is loaded lazily and runs on CPU. The first model-backed analysis may
+take longer while the model is downloaded and initialized.
+
+## Quick start
+
+From this directory:
+
+```bash
+uv sync
+uv run streamlit run app.py
+
+
+To run the model-independent routing checks:
+
+```bash
+uv run python test_engine.py
+```
+
+These checks do not download or initialize the Hugging Face model.
+
+## Using the app
+
+1. In **Review inspector**, analyze the prefilled example or enter a branch,
+   rating, and review.
+2. Review the predicted aspect, risk level, confidence, rationale, and assigned
+   lane.
+3. Open **Branch dashboard** and run the sample set, or upload your own CSV.
+4. Compare branch-level routing counts and inspect escalations.
+
+CSV uploads must include a `review` column. The following columns
+are optional:
+
+| Column | Description |
+| --- | --- |
+| `branch` | Branch or location name |
+| `rating` | Star rating from 1 to 5 |
+| `reviewer` | Reviewer name or identifier |
+
+Blank review rows are ignored.
+
+## Project structure
+
+| File | Purpose |
+| --- | --- |
+| `app.py` | Streamlit review inspector and multi-branch dashboard |
+| `engine.py` | Typed review/result schemas, lazy NLI classifier, risk handling, reply drafting, and routing policy |
+| `test_engine.py` | Model-independent routing checks |
+| `pyproject.toml` | Project metadata and direct dependency declarations |
+| `uv.lock` | Locked dependency versions used by `uv sync` |
+
+## Limitations
+
+Model predictions and phrase overrides are prototypes, not guarantees of
+correct classification. 
