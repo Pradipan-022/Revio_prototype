@@ -1,0 +1,24 @@
+[project]
+name = "revio-triage-poc"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Pradipan-022", email = "pradipan222@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "altair==5.5.0",
+    "pydantic==2.8.2",
+    "requests==2.34.2",
+    "streamlit==1.38.0",
+    "torch==2.4.1",
+    "transformers==4.44.2",
+]
+
+[project.scripts]
+revio-triage-poc = "revio_triage_poc:main"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13.0"]
+build-backend = "uv_build"
