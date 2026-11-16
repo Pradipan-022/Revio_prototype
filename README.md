@@ -64,7 +64,7 @@ From this directory:
 
 ```bash
 uv sync
-uv run streamlit run app.py
+uv run -m streamlit run app.py
 ```
 
 To run the model-independent routing checks:
