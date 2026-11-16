@@ -13,10 +13,15 @@ restaurant and cafe group.
 
 ## Product demo
 
-> **Demo coming soon:** Add a short recording at `docs/demo.gif` to showcase the
-> review inspector and branch dashboard.
+Two short recordings will demonstrate the app's main workflows.
 
-<!-- Replace this placeholder with: ![Revio AI Triage demo](docs/demo.gif) -->
+### Review inspector
+
+![Review inspector: aspect, risk, and route](docs/demo1.gif)
+
+### Branch dashboard
+
+![Branch dashboard: review volume and routing](docs/demo2.gif)
 
 ## What it does
 
@@ -60,7 +65,7 @@ From this directory:
 ```bash
 uv sync
 uv run streamlit run app.py
-
+```
 
 To run the model-independent routing checks:
 
