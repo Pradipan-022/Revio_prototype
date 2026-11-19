@@ -4,6 +4,10 @@
 
 [DRIVE LINK](https://drive.google.com/drive/folders/1zkxEOXL5xVGLXfG451a7s7uu3WAik59k?usp=sharing)
 
+**<mark>NOTE: I have deployed the streamlit app. Please find the link down below.</mark>**
+
+[STREAMLIT APP](https://revioprototype.streamlit.app/)
+
 **Aspect attribution and risk-aware reply routing for customer reviews.**
 
 Revio AI Triage is a Streamlit proof of concept for a reputation-management
